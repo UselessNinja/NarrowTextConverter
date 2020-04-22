@@ -1,8 +1,12 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
+
+#################################################################
+# Script made by Daalehner for Hiraeth and Fire Emblem Universe #
+#  The code is free to use and modify as long as you credit me  #
+#################################################################
 
 import os, sys, re
-from itertools import tee, islice, chain
 
 def printerr(str, code):
     print(str)
@@ -36,6 +40,17 @@ def dictconv():
     }
     return dc
 
+def specommands(command):
+    dictcommands = {
+        #They only work while writing in serif. The only exeption is [ALPHA] which has a menu font variant. 
+        #(Menu font is used in Character Names, Item Names, Class Names, etc...)
+        "[CV]": "[0x7B]", "[AR]": "[0x7C]", "[PG]": "[0x7D]", "[DR]": "[0x7F]", #CV: Mounted, AR: Armored, PG: Flying, DR: Dragon
+        "[SW]": "[0xB3]", "[LC]": "[0xB4]", "[AX]": "[0xB5]", "[BW]": "[0xB6]", #SW: Sword, LC: Lance, AX: Axe, BW: Bow
+        "[LT]": "[0xB7]", "[AN]": "[0xB8]", "[DK]": "[0xB9]", "[SF]": "[0xBA]", #LT: Light, AN: Anima, DK: Dark, SF: Staff
+        "[ALPHA]": "[0xAA]", "[INF]": "[0x7B][0x7C]", "[WYV]": "[0x7D][0x7F]" #ALPHA: α, INF: Infantry (Mounted + Armored), WYV: Wyvern (Flying + Dragon)
+    }
+    return dictcommands.get(command)
+
 def getscript():
     fp = []
     for file in os.listdir("."):
@@ -47,7 +62,7 @@ def getscript():
         printerr("Please put only one script in the folder", 84)
     return fp
 
-def initialconversion(fp):
+def narrowscriptconverter(fp):
     f = open(fp[0], "r", encoding="utf8")
     newfilec = ""
     trans = str.maketrans(dictconv())
@@ -55,14 +70,14 @@ def initialconversion(fp):
 
     for line in f:
         if (re.search('^(\[\w+\])$', line)):
-            if (line == "[Yes]\n" or line == "[No]\n" or line == "[ShopContinue]\n" or line == "[LoadOverworldFaces]\n"):
+            if (line == "[Yes]\n" or line == "[No]\n" or line == "[ShopContinue]\n" or line == "[LoadOverworldFaces]\n" or line == "[A]\n"):
                 newfilec += line
             else:
                 id_ = int("0x" + re.sub('[\[\]]', '', line.strip()), 16)
                 newfilec += line
-                if (id_ >= 0x020E and id_ <= 0x04E4 or id_ >= 0x08D8 and id_ <= 0x08FB
-                 or id_ >= 0x0903 and id_ <= 0x0DFF or id_ >= 0x0E20 and id_ <= 0x0EFD
-                 or id_ >= 0x0F0A and id_ <= 0x0F13 or id_ >= 0x0F23 and id_ <= 0x0F74
+                if (id_ >= 0x020E and id_ <= 0x04E4 or id_ >= 0x08D8 and id_ <= 0x08FB #Those Ranges are based on Hiraeth's script
+                 or id_ >= 0x0903 and id_ <= 0x0DFF or id_ >= 0x0E20 and id_ <= 0x0EFD #but they are compatible with Vanilla and
+                 or id_ >= 0x0F0A and id_ <= 0x0F13 or id_ >= 0x0F23 and id_ <= 0x0F74 #Skill System versions.
                  or id_ >= 0x1001 and id_ == 0x0F1B):
                     do_translate = True
                 else:
@@ -72,7 +87,10 @@ def initialconversion(fp):
             stringsplit = re.split('(\[\w+\])', line)
             for split in stringsplit:
                 if re.search('^(\[\w+\])$', split):
-                    translatedline += split
+                    if specommands(split) != None:
+                        translatedline += specommands(split)
+                    else:
+                        translatedline += split
                 else:
                     translatedline += ''.join(split.translate(trans))
             newfilec += translatedline
@@ -86,7 +104,7 @@ def initialconversion(fp):
 
 def main():
     fp = getscript()
-    initialconversion(fp)
+    narrowscriptconverter(fp)
     return
 
 if __name__ == '__main__':
