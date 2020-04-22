@@ -1,4 +1,7 @@
 # NarrowTextConverter
+
+**DOWNLOAD HERE : (Releases)[https://github.com/UselessNinja/NarrowTextConverter/releases]**
+
 Made for use with this hack: https://feuniverse.us/t/scraizas-crazy-asm/5624/2 by Scraiza
 
 Originaly made for use on this: https://feuniverse.us/t/fire-emblem-hiraeth-legacies-the-empyrean-prophecy/5412
