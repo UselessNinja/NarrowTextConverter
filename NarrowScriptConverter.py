@@ -69,24 +69,27 @@ def narrowscriptconverter(fp):
     do_translate = False
 
     for line in f:
-        if (re.search('^(\[\w+\])$', line)):
-            if (line == "[Yes]\n" or line == "[No]\n" or line == "[ShopContinue]\n" or line == "[LoadOverworldFaces]\n" or line == "[A]\n"):
-                newfilec += line
-            else:
-                id_ = int("0x" + re.sub('[\[\]]', '', line.strip()), 16)
-                newfilec += line
-                if (id_ >= 0x020E and id_ <= 0x04E4 or id_ >= 0x08D8 and id_ <= 0x08FB #Those Ranges are based on Hiraeth's script
-                 or id_ >= 0x0903 and id_ <= 0x0DFF or id_ >= 0x0E20 and id_ <= 0x0EFD #but they are compatible with Vanilla and
-                 or id_ >= 0x0F0A and id_ <= 0x0F13 or id_ >= 0x0F23 and id_ <= 0x0F74 #Skill System versions.
-                 or id_ >= 0x1001 and id_ == 0x0F1B):
-                    do_translate = True
+        if (re.search(r'^(\[\w+\])$', line)):
+            try:
+                id_ = int("0x" + re.sub(r'[\[\]]', '', line.strip()), 16)
+                if (id_ == 0xA):
+                    newfilec += line
                 else:
-                    do_translate = False
+                    newfilec += line
+                    if (id_ >= 0x020E and id_ <= 0x04E4 or id_ >= 0x08D8 and id_ <= 0x08FB #Those Ranges are based on Hiraeth's script
+                    or id_ >= 0x0903 and id_ <= 0x0DFF or id_ >= 0x0E20 and id_ <= 0x0EFD #but they are compatible with Vanilla and
+                    or id_ >= 0x0F0A and id_ <= 0x0F13 or id_ >= 0x0F23 and id_ <= 0x0F74 #Skill System versions.
+                    or id_ >= 0x1001 or id_ == 0x0F1B):
+                        do_translate = True
+                    else:
+                        do_translate = False
+            except ValueError:
+                newfilec += line
         elif do_translate == True:
             translatedline = ""
-            stringsplit = re.split('(\[\w+\])', line)
+            stringsplit = re.split(r'(\[\w+\])', line)
             for split in stringsplit:
-                if re.search('^(\[\w+\])$', split):
+                if re.search(r'^(\[\w+\])$', split):
                     if specommands(split) != None:
                         translatedline += specommands(split)
                     else:
